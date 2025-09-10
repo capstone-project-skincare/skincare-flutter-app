@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../home/home_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -28,11 +28,7 @@ class _SignupScreenState extends State<SignupScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      context.go('/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message;
@@ -72,6 +68,10 @@ class _SignupScreenState extends State<SignupScreen> {
                 onPressed: _signup,
                 child: const Text("Sign Up"),
               ),
+            TextButton(
+              onPressed: () => context.go('/login'),
+              child: const Text("Already have an account? Login"),
+            ),
           ],
         ),
       ),

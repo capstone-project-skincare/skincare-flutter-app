@@ -1,55 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../providers/user_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.user;
+
     return Scaffold(
       appBar: AppBar(title: const Text("Profile")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage("assets/images/profile_picture.jpg"),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              "John Doe",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text("johndoe@email.com",
-                style: TextStyle(color: Colors.grey, fontSize: 16)),
-            const SizedBox(height: 16),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.face, color: Colors.teal),
-                SizedBox(width: 6),
-                Text("Skin Type: Combination",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-              ],
-            ),
-            const Spacer(),
-            ElevatedButton.icon(
-              onPressed: () {
-                context.go("/login"); // simple logout for now
-              },
-              icon: const Icon(Icons.logout),
-              label: const Text("Logout"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+      body: user == null
+          ? const Center(child: Text("Not logged in"))
+          : Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.center, // Center horizontally
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      child: Text(user.email![0].toUpperCase()),
+                    ),
+                    const SizedBox(height: 20),
+                    Text("Email: ${user.email}",
+                        style: const TextStyle(fontSize: 16)),
+                    Text("UID: ${user.uid}",
+                        style: const TextStyle(fontSize: 16)),
+                    const Divider(height: 40),
+                    const Text("Skin Type: TBD",
+                        style: TextStyle(fontSize: 16)),
+                    const Text("Conditions: TBD",
+                        style: TextStyle(fontSize: 16)),
+                    const Text("Recommendations: TBD",
+                        style: TextStyle(fontSize: 16)),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => userProvider.signOut(),
+                      child: const Text("Logout"),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
