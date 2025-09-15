@@ -50,7 +50,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        title: Text(
+          "Login",
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -58,14 +66,55 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: "Email"),
+              decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: Colors.transparent, // or Colors.pink
+                    width: 2,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .secondary, // or Colors.pink
+                    width: 2,
+                  ),
+                ),
+                hintText: "Email",
+              ),
+            ),
+            const SizedBox(
+              height: 10,
             ),
             TextField(
               controller: _passwordController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: "Password"),
+              decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: Colors.transparent, // or Colors.pink
+                    width: 2,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .secondary, // or Colors.pink
+                    width: 2,
+                  ),
+                ),
+                hintText: "Password",
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(
+              height: 20,
+            ),
             if (_error != null)
               Text(_error!, style: const TextStyle(color: Colors.red)),
             if (_loading)
@@ -73,7 +122,10 @@ class _LoginScreenState extends State<LoginScreen> {
             else
               ElevatedButton(
                 onPressed: _login,
-                child: const Text("Login"),
+                child: Text(
+                  "Login",
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
               ),
             TextButton(
               onPressed: () => context.go('/signup'),

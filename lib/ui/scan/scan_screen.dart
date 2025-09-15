@@ -36,7 +36,14 @@ class _ScanScreenState extends State<ScanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Scan"),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        title: Text(
+          "Scan",
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge!
+              .copyWith(fontWeight: FontWeight.bold),
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -68,13 +75,20 @@ class _ScanScreenState extends State<ScanScreen> {
               ElevatedButton.icon(
                 onPressed: () => _pickImage(ImageSource.camera),
                 icon: const Icon(Icons.camera_alt),
-                label: const Text("Take Photo"),
+                label: Text(
+                  "Take Photo",
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
               ),
+              
               const SizedBox(height: 10),
               ElevatedButton.icon(
                 onPressed: () => _pickImage(ImageSource.gallery),
                 icon: const Icon(Icons.photo),
-                label: const Text("Upload from Gallery"),
+                label: Text(
+                  "Upload from Gallery",
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
               ),
             ],
           ),

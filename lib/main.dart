@@ -33,9 +33,10 @@ class SkincareApp extends StatelessWidget {
       redirect: (context, state) {
         final loggedIn = userProvider.isLoggedIn;
         final loggingIn = state.uri.toString() == '/login';
+        final signingUp = state.uri.toString() == '/signup';
 
-        if (!loggedIn && !loggingIn) return '/login';
-        if (loggedIn && loggingIn) return '/home';
+        if (!loggedIn && !loggingIn && !signingUp) return '/login';
+        if (loggedIn && (loggingIn || signingUp)) return '/home';
         return null;
       },
       routes: [
@@ -61,8 +62,62 @@ class SkincareApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Skincare App',
       theme: ThemeData(
-        primarySwatch: Colors.teal,
+        primarySwatch: Colors.pink,
         scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFF8BBD0), // light pink
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.pink,
+          accentColor: Color(0xFFF8BBD0), // light pink
+          backgroundColor: Colors.white,
+        ).copyWith(
+          secondary: Color(0xFFF8BBD0), // light pink
+          surface: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFFF8BBD0), // light pink
+            foregroundColor: Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.pink,
+          ),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Color(0xFFFCE4EC), // very light pink
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFF8BBD0)),
+          ),
+        ),
+        cardColor: Color(0xFFFCE4EC), // very light pink
+        chipTheme: ChipThemeData(
+          backgroundColor: Color(0xFFF8BBD0),
+          labelStyle: const TextStyle(color: Colors.black),
+          selectedColor: Colors.pink,
+        ),
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.black),
+          bodyMedium: TextStyle(color: Colors.black),
+          bodySmall: TextStyle(color: Colors.black),
+          titleLarge: TextStyle(color: Colors.black),
+          titleMedium: TextStyle(color: Colors.black),
+          titleSmall: TextStyle(color: Colors.black),
+          headlineLarge: TextStyle(color: Colors.black),
+          headlineMedium: TextStyle(color: Colors.black),
+          headlineSmall: TextStyle(color: Colors.black),
+          labelLarge: TextStyle(color: Colors.black),
+          labelMedium: TextStyle(color: Colors.black),
+          labelSmall: TextStyle(color: Colors.black),
+        ),
       ),
       routerConfig: _router,
     );

@@ -11,7 +11,15 @@ class ProfileScreen extends StatelessWidget {
     final user = userProvider.user;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Profile")),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        title: Text(
+          "Profile",
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+      ),
       body: user == null
           ? const Center(child: Text("Not logged in"))
           : Center(
@@ -40,7 +48,10 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () => userProvider.signOut(),
-                      child: const Text("Logout"),
+                      child: Text(
+                        "Logout",
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
                     ),
                   ],
                 ),

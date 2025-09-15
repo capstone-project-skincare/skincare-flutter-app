@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skincare_app/ui/home/dashboard_page.dart';
 import '../scan/scan_screen.dart';
 import '../profile/profile_screen.dart';
 import 'package:skincare_app/ui/recommendations/recommendations_tab.dart';
@@ -13,11 +14,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
-    Center(child: Text("Dashboard / Home", style: TextStyle(fontSize: 22))),
-    ScanScreen(),
-    RecommendationsTab(),
-    ProfileScreen(),
+  final List<Widget> _pages = [
+    const DashboardPage(),
+    const ScanScreen(),
+    const RecommendationsTab(),
+    const ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -33,7 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // important for 4+ items
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.pink,
+        unselectedItemColor: Colors.black,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
