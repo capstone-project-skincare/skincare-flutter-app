@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:skincare_app/services/firestore_service.dart';
 
 class RecommendationsTab extends StatefulWidget {
   const RecommendationsTab({super.key});
@@ -9,35 +11,30 @@ class RecommendationsTab extends StatefulWidget {
 
 class _RecommendationsTabState extends State<RecommendationsTab> {
   bool _loading = true;
-  List<Map<String, String>> _recommendations = [];
+  final FirestoreService _firestoreService = FirestoreService();
+  List<String> _recommendedIngredients = [];
 
   @override
   void initState() {
     super.initState();
+    _loadRecommendations();
+  }
 
-    // Simulate API call (later replace with real backend call)
-    Future.delayed(const Duration(seconds: 2), () {
+  Future<void> _loadRecommendations() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final ingredients =
+          await _firestoreService.getRecommendedIngredients(uid);
       setState(() {
-        _recommendations = [
-          {
-            "ingredient": "Salicylic Acid",
-            "benefit": "Helps unclog pores and reduce acne",
-            "example": "Paula's Choice BHA 2% Exfoliant",
-          },
-          {
-            "ingredient": "Niacinamide",
-            "benefit": "Improves skin texture and reduces inflammation",
-            "example": "The Ordinary Niacinamide 10% + Zinc 1%",
-          },
-          {
-            "ingredient": "Hyaluronic Acid",
-            "benefit": "Boosts hydration and plumps skin",
-            "example": "CeraVe Hydrating Serum",
-          },
-        ];
+        _recommendedIngredients = ingredients;
         _loading = false;
       });
-    });
+    } else {
+      setState(() {
+        _recommendedIngredients = [];
+        _loading = false;
+      });
+    }
   }
 
   @override
@@ -45,73 +42,32 @@ class _RecommendationsTabState extends State<RecommendationsTab> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        title: Text(
-          "Recommendations",
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
+        title: const Text("Recommendations"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Loading state
-            if (_loading)
-              const Center(child: CircularProgressIndicator())
-
-            // Empty state
-            else if (_recommendations.isEmpty)
-              const Text(
-                "No recommendations yet. Run a scan to get started!",
-                style: TextStyle(color: Colors.grey),
-              )
-
-            // List of recommendations
-            else
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _recommendations.length,
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _recommendedIngredients.isEmpty
+              ? const Center(
+                  child: Text(
+                    "No recommendations yet. Run a scan to get started!",
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _recommendedIngredients.length,
                   itemBuilder: (context, index) {
-                    final rec = _recommendations[index];
                     return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      margin: const EdgeInsets.all(8),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              rec["ingredient"]!,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              rec["benefit"]!,
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              "Example: ${rec["example"]!}",
-                              style: const TextStyle(
-                                color: Colors.blueGrey,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          _recommendedIngredients[index],
+                          style: const TextStyle(fontSize: 18),
                         ),
                       ),
                     );
                   },
                 ),
-              ),
-          ],
-        ),
-      ),
     );
   }
 }
