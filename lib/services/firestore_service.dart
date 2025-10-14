@@ -47,4 +47,12 @@ class FirestoreService {
       'lastScan': DateTime.now(),
     });
   }
+
+  Future<List<String>> getUserDetectionClasses(String uid) async {
+    final doc = await _db.collection('users').doc(uid).get();
+    final data = doc.data();
+    if (data == null || data['scanDetections'] == null) return [];
+    final detections = List<Map<String, dynamic>>.from(data['scanDetections']);
+    return detections.map((d) => d['class'] as String).toList();
+  }
 }

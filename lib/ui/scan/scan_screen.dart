@@ -61,7 +61,19 @@ class _ScanScreenState extends State<ScanScreen> {
         // Save detections to Firestore
         final uid = FirebaseAuth.instance.currentUser?.uid;
         if (uid != null && _detections.isNotEmpty) {
-          await FirestoreService().saveScanDetections(uid, _detections);
+          // Get existing detection classes
+          final existingClasses =
+              await FirestoreService().getUserDetectionClasses(uid);
+
+          // Filter out detections that already exist
+          final newDetections = _detections
+              .where((det) => !existingClasses.contains(det['class']))
+              .toList();
+
+          // Save only new detections
+          if (newDetections.isNotEmpty) {
+            await FirestoreService().saveScanDetections(uid, newDetections);
+          }
         }
       } catch (_) {
         setState(() {
