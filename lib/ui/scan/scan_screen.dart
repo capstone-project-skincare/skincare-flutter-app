@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:skincare_app/services/firestore_service.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -55,6 +57,12 @@ class _ScanScreenState extends State<ScanScreen> {
                   .toList() ??
               [];
         });
+
+        // Save detections to Firestore
+        final uid = FirebaseAuth.instance.currentUser?.uid;
+        if (uid != null && _detections.isNotEmpty) {
+          await FirestoreService().saveScanDetections(uid, _detections);
+        }
       } catch (_) {
         setState(() {
           _message = responseBody;

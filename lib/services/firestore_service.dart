@@ -39,4 +39,12 @@ class FirestoreService {
       'ingredients': ingredients,
     });
   }
+
+  Future<void> saveScanDetections(
+      String uid, List<Map<String, dynamic>> detections) async {
+    await _db.collection('users').doc(uid).update({
+      'scanDetections': FieldValue.arrayUnion(detections),
+      'lastScan': DateTime.now(),
+    });
+  }
 }
