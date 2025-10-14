@@ -14,7 +14,8 @@ class ScanScreen extends StatefulWidget {
 class _ScanScreenState extends State<ScanScreen> {
   File? _selectedImage;
   bool _isLoading = false;
-  String? _resultText;
+  String? _message;
+  List<Map<String, dynamic>> _detections = [];
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(ImageSource source) async {
@@ -24,10 +25,10 @@ class _ScanScreenState extends State<ScanScreen> {
       setState(() {
         _selectedImage = File(pickedFile.path);
         _isLoading = true;
-        _resultText = null;
+        _message = null;
+        _detections = [];
       });
 
-      // Send image to API
       await _sendImageToApi(_selectedImage!);
 
       setState(() {
@@ -45,21 +46,25 @@ class _ScanScreenState extends State<ScanScreen> {
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
 
-      // Try to parse JSON
-      String displayText;
       try {
         final json = jsonDecode(responseBody);
-        displayText = json.toString(); // Or extract specific fields
+        setState(() {
+          _message = "Detected ${json['count']} condition(s)";
+          _detections = (json['detections'] as List<dynamic>?)
+                  ?.map((e) => Map<String, dynamic>.from(e))
+                  .toList() ??
+              [];
+        });
       } catch (_) {
-        displayText = responseBody;
+        setState(() {
+          _message = responseBody;
+          _detections = [];
+        });
       }
-
-      setState(() {
-        _resultText = displayText;
-      });
     } catch (e) {
       setState(() {
-        _resultText = 'Error: $e';
+        _message = 'Error: $e';
+        _detections = [];
       });
     }
   }
@@ -96,14 +101,59 @@ class _ScanScreenState extends State<ScanScreen> {
                   children: [
                     Image.file(_selectedImage!, height: 300),
                     const SizedBox(height: 10),
-                    const Text("Scan Complete!",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                    if (_resultText != null)
+                    Text(
+                      _message ?? "Scan Complete!",
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    if (_detections.isNotEmpty)
+                      Card(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withOpacity(0.1),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Detected Conditions",
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 10),
+                              ..._detections.map((det) => ListTile(
+                                    leading: Icon(Icons.check_circle,
+                                        color: Colors.pink),
+                                    title: Text(
+                                      det['class'] ?? '',
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                    subtitle: det['bbox'] != null
+                                        ? Text(
+                                            "Bounding Box: ${det['bbox'].map((v) => v.toStringAsFixed(1)).join(', ')}")
+                                        : null,
+                                    trailing: Text(
+                                      "${det['confidence']?.toStringAsFixed(1) ?? '0'}%",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                    ),
+                                  )),
+                            ],
+                          ),
+                        ),
+                      )
+                    else
                       Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Text(_resultText!,
-                            style: Theme.of(context).textTheme.bodyLarge),
+                        child: Text(
+                          "No conditions detected.",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
                       ),
                   ],
                 )
