@@ -129,10 +129,7 @@ class _ScanScreenState extends State<ScanScreen> {
                     const SizedBox(height: 10),
                     if (_detections.isNotEmpty)
                       Card(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .secondary
-                            .withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.secondary,
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         child: Padding(
