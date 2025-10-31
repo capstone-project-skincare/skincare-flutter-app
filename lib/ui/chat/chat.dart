@@ -210,15 +210,32 @@ class ChatTab extends StatefulWidget {
 class _ChatTabState extends State<ChatTab> {
   final List<Message> _messages = [];
   final TextEditingController _textController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.minScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
 
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
+
+    _textController.clear();
 
     setState(() {
       _messages.add(Message(text, true));
       _isLoading = true;
     });
+
+    _scrollToBottom(); // 👈 scroll immediately after user sends
 
     try {
       final response = await http.post(
@@ -235,15 +252,18 @@ class _ChatTabState extends State<ChatTab> {
         setState(() {
           _messages.add(Message(data['response'], false, shouldAnimate: true));
         });
+        _scrollToBottom(); // 👈 scroll when AI reply arrives
       } else {
         setState(() {
           _messages.add(Message('Sorry, I encountered an error.', false));
         });
+        _scrollToBottom();
       }
     } catch (e) {
       setState(() {
         _messages.add(Message('Network error occurred.', false));
       });
+      _scrollToBottom();
     } finally {
       setState(() {
         _isLoading = false;
@@ -423,10 +443,15 @@ class _ChatTabState extends State<ChatTab> {
             children: [
               Expanded(
                 child: ListView.builder(
+                  controller: _scrollController,
+                  reverse: true, // 👈 makes new messages appear at the bottom
                   padding: const EdgeInsets.all(8),
                   itemCount: _messages.length,
-                  itemBuilder: (context, index) =>
-                      _buildMessageBubble(_messages[index]),
+                  itemBuilder: (context, index) {
+                    final message = _messages[
+                        _messages.length - 1 - index]; // 👈 reverse order
+                    return _buildMessageBubble(message);
+                  },
                 ),
               ),
               if (_isLoading) const TypingIndicator(),
