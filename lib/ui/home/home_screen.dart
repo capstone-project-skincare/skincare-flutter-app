@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:skincare_app/ui/home/dashboard_page.dart';
 import '../scan/scan_screen.dart';
 import '../profile/profile_screen.dart';
-import 'package:skincare_app/ui/recommendations/recommendations_tab.dart';
+import 'package:skincare_app/ui/chat/chat.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     const DashboardPage(),
     const ScanScreen(),
-    const RecommendationsTab(),
+    const ChatTab(),
     const ProfileScreen(),
   ];
 
