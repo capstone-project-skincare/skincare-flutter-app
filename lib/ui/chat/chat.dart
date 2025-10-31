@@ -208,10 +208,28 @@ class ChatTab extends StatefulWidget {
 }
 
 class _ChatTabState extends State<ChatTab> {
-  final List<Message> _messages = [];
+  List<Message> _messages = [];
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with greeting message
+    _messages = [
+      Message(
+        "👋 Hi there! I'm your personal skincare assistant. I can help you with:\n\n" +
+            "* Skincare advice and recommendations\n" +
+            "* Understanding ingredients\n" +
+            "* Creating a skincare routine\n" +
+            "* Addressing specific skin concerns\n\n" +
+            "How can I help you today?",
+        false,
+        shouldAnimate: true,
+      ),
+    ];
+  }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
