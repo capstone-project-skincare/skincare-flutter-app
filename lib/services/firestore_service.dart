@@ -55,4 +55,11 @@ class FirestoreService {
     final detections = List<Map<String, dynamic>>.from(data['scanDetections']);
     return detections.map((d) => d['class'] as String).toList();
   }
+
+  Future<void> updateUserSkinType(String uid, String skinType) async {
+    await _db.collection('users').doc(uid).update({
+      'skinType': skinType,
+      'lastSkinTypeUpdate': FieldValue.serverTimestamp(),
+    });
+  }
 }

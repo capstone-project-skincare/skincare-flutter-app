@@ -20,6 +20,9 @@ class _ScanScreenState extends State<ScanScreen> {
   List<Map<String, dynamic>> _detections = [];
   final ImagePicker _picker = ImagePicker();
 
+  // Add new state variable
+  String? _skinType;
+
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
 
@@ -29,6 +32,7 @@ class _ScanScreenState extends State<ScanScreen> {
         _isLoading = true;
         _message = null;
         _detections = [];
+        _skinType = null;
       });
 
       await _sendImageToApi(_selectedImage!);
@@ -36,6 +40,33 @@ class _ScanScreenState extends State<ScanScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  // Update _classifySkinType to set state
+  Future<void> _classifySkinType(File imageFile) async {
+    final url = Uri.parse('http://192.168.29.189:8000/classify-skin/');
+    var request = http.MultipartRequest('POST', url)
+      ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+
+    try {
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      final json = jsonDecode(responseBody);
+      final skinType = json['skin_type'];
+
+      setState(() {
+        _skinType = skinType;
+      });
+
+      // Save skin type to Firestore
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null && skinType != null) {
+        await FirestoreService().updateUserSkinType(uid, skinType);
+      }
+    } catch (e) {
+      print('Error classifying skin type: $e');
     }
   }
 
@@ -87,6 +118,9 @@ class _ScanScreenState extends State<ScanScreen> {
         _detections = [];
       });
     }
+
+    // Add skin type classification after detection
+    await _classifySkinType(imageFile);
   }
 
   @override
@@ -127,6 +161,31 @@ class _ScanScreenState extends State<ScanScreen> {
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
+                    if (_skinType != null)
+                      Card(
+                        color: Theme.of(context).colorScheme.secondary,
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Skin Type Analysis",
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 10),
+                              ListTile(
+                                leading: Icon(Icons.face, color: Colors.pink),
+                                title: Text(
+                                  _skinType!,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     if (_detections.isNotEmpty)
                       Card(
                         color: Theme.of(context).colorScheme.secondary,
@@ -149,10 +208,6 @@ class _ScanScreenState extends State<ScanScreen> {
                                       style:
                                           Theme.of(context).textTheme.bodyLarge,
                                     ),
-                                    subtitle: det['bbox'] != null
-                                        ? Text(
-                                            "Bounding Box: ${det['bbox'].map((v) => v.toStringAsFixed(1)).join(', ')}")
-                                        : null,
                                     trailing: Text(
                                       "${det['confidence']?.toStringAsFixed(1) ?? '0'}%",
                                       style: Theme.of(context)

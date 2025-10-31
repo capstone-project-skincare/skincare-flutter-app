@@ -17,6 +17,8 @@ class ProfileScreen extends StatelessWidget {
           .toList(),
       'recommendedIngredients':
           List<String>.from(data['recommendedIngredients'] ?? []),
+      'skinType':
+          data['skinType'] as String? ?? 'Not determined', // Add this line
     };
   }
 
@@ -47,6 +49,8 @@ class ProfileScreen extends StatelessWidget {
                     snapshot.data!['scanDetections'] as List<String>;
                 final ingredients =
                     snapshot.data!['recommendedIngredients'] as List<String>;
+                final skinType =
+                    snapshot.data!['skinType'] as String; // Add this line
 
                 return Padding(
                   padding: const EdgeInsets.all(16),
@@ -82,7 +86,8 @@ class ProfileScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               Chip(
-                                label: const Text("Dry"),
+                                label: Text(
+                                    skinType), // Use the dynamic skinType here
                                 backgroundColor: Colors.pink.shade50,
                                 labelStyle:
                                     const TextStyle(color: Colors.black),
