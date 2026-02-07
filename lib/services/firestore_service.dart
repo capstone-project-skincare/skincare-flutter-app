@@ -42,10 +42,10 @@ class FirestoreService {
 
   Future<void> saveScanDetections(
       String uid, List<Map<String, dynamic>> detections) async {
-    await _db.collection('users').doc(uid).update({
+    await _db.collection('users').doc(uid).set({
       'scanDetections': FieldValue.arrayUnion(detections),
       'lastScan': DateTime.now(),
-    });
+    }, SetOptions(merge: true));
   }
 
   Future<List<String>> getUserDetectionClasses(String uid) async {
@@ -57,9 +57,9 @@ class FirestoreService {
   }
 
   Future<void> updateUserSkinType(String uid, String skinType) async {
-    await _db.collection('users').doc(uid).update({
+    await _db.collection('users').doc(uid).set({
       'skinType': skinType,
       'lastSkinTypeUpdate': FieldValue.serverTimestamp(),
-    });
+    }, SetOptions(merge: true));
   }
 }
