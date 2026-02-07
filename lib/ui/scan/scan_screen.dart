@@ -45,7 +45,7 @@ class _ScanScreenState extends State<ScanScreen> {
 
   // Update _classifySkinType to set state
   Future<void> _classifySkinType(File imageFile) async {
-    final url = Uri.parse('http://192.168.29.189:8000/classify-skin/');
+    final url = Uri.parse('http://192.168.31.99:8000/classify-skin/');
     var request = http.MultipartRequest('POST', url)
       ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
 
@@ -71,7 +71,7 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _sendImageToApi(File imageFile) async {
-    final url = Uri.parse('http://192.168.29.189:8000/detect/');
+    final url = Uri.parse('http://192.168.31.99:8000/detect/');
     var request = http.MultipartRequest('POST', url)
       ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
 
@@ -161,6 +161,7 @@ class _ScanScreenState extends State<ScanScreen> {
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
+                    // Handle skin type gracefully
                     if (_skinType != null)
                       Card(
                         color: Theme.of(context).colorScheme.secondary,
@@ -185,7 +186,16 @@ class _ScanScreenState extends State<ScanScreen> {
                             ],
                           ),
                         ),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          "Skin type analysis not available for this scan.",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
                       ),
+                    // Detected conditions
                     if (_detections.isNotEmpty)
                       Card(
                         color: Theme.of(context).colorScheme.secondary,

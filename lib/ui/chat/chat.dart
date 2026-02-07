@@ -257,7 +257,7 @@ class _ChatTabState extends State<ChatTab> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.29.189:8000/chat'),
+        Uri.parse('http://192.168.31.99:8000/chat'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'message': text,
